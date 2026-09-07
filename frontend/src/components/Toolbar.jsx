@@ -153,16 +153,16 @@ export default function Toolbar({
               gap:         "6px",
             }}
           >
-            {projectName} <span style={{ fontSize: "11px", opacity: 0.7 }}>✏️</span>
+            {projectName} <span style={{ fontSize: "11px", opacity: 0.7 }}></span>
           </button>
         )}
       </div>
 
       {/* ── Save button ──────────────────────────────────────── */}
-      <ToolBtn onClick={onSaveProject} title="Save project" icon="💾" label="Save" />
+      <ToolBtn onClick={onSaveProject} title="Save project" icon="" label="Save" />
 
       {/* ── Projects panel toggle ────────────────────────────── */}
-      <ToolBtn onClick={onToggleProjectPanel} title="All projects" icon="📁" label="Projects" />
+      <ToolBtn onClick={onToggleProjectPanel} title="All projects" icon="" label="Projects" />
 
       {/* ── Spacer ───────────────────────────────────────────── */}
       <div style={{ flex: 1 }} />
@@ -197,7 +197,7 @@ export default function Toolbar({
 
       {/* ── Port selector ─────────────────────────────────────── */}
       <label style={labelStyle}>Port</label>
-      <div style={{ display: "flex", gap: "4px" }}>
+      <div style={{ display: "flex", gap: "3px" }}>
         <select
           value={selectedPort}
           onChange={e => onPortChange(e.target.value)}
@@ -213,58 +213,37 @@ export default function Toolbar({
           title="Refresh ports"
           style={{ ...selectStyle, padding: "0 8px", cursor: "pointer", minWidth: "unset" }}
         >
-          🔄
-        </button>
-        <button
-          onClick={onOpenSerialMonitor}
-          title="Open Serial Monitor"
-          style={{ ...selectStyle, padding: "0 8px", cursor: "pointer", minWidth: "unset", backgroundColor: colors.accentOrange, border: "none" }}
-        >
-          🔌
+          Refresh
         </button>
       </div>
 
       {/* ── Upload button & Progress ───────────────────────────── */}
-      {uploading ? (
-        <div style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "4px",
-          width: "160px"
-        }}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: fontSizes.xs, color: "#fff", fontFamily: fonts.ui, fontWeight: 700 }}>
-            <span>{uploadStep}</span>
-            <span>{uploadProgress}%</span>
-          </div>
-          <div style={{ width: "100%", height: "8px", background: "rgba(0,0,0,0.3)", borderRadius: "4px", overflow: "hidden" }}>
-            <div style={{ width: `${uploadProgress}%`, height: "100%", background: colors.success, transition: "width 0.3s ease" }} />
-          </div>
-        </div>
-      ) : (
         <button
-          onClick={handleUpload}
+          onClick={!uploading ? handleUpload : undefined}
           style={{
-            fontFamily:   fonts.ui,
-            fontSize:     fontSizes.md,
-            fontWeight:   800,
-            padding:      `${spacing.sm} ${spacing.xl}`,
-            background:   colors.accentOrange,
-            color:        "#fff",
-            border:       "none",
-            borderRadius: radius.md,
-            cursor:       "pointer",
-            boxShadow:    shadows.md,
-            transition:   "all 0.15s ease",
-            display:      "flex",
-            alignItems:   "center",
-            gap:          spacing.sm,
-            whiteSpace:   "nowrap",
+            fontFamily:    fonts.ui,
+            fontSize:      fontSizes.md,
+            fontWeight:    800,
+            padding:       `${spacing.sm} ${spacing.xl}`,
+            background:    uploading
+              ? `linear-gradient(to right, ${colors.primaryGreenDark} ${uploadProgress}%, rgba(29,185,84,0.3) ${uploadProgress}%)`
+              : colors.primaryGreenDark,
+            color:         "#fff",
+            border:        "none",
+            borderRadius:  radius.md,
+            cursor:        uploading ? "not-allowed" : "pointer",
+            boxShadow:     shadows.md,
+            transition:    "background 0.3s ease",
+            whiteSpace:    "nowrap",
             letterSpacing: "0.03em",
+            minWidth:      "120px",
+            position:      "relative",
+            overflow:      "hidden",
           }}
         >
-          Upload
+          {uploading ? `${uploadStep} ${uploadProgress}%` : "Upload"}
         </button>
-      )}
+      
 
     </header>
   );
@@ -301,8 +280,8 @@ function ToolBtn({ onClick, title, icon, label }) {
 const labelStyle = {
   fontFamily:  fonts.ui,
   fontSize:    fontSizes.xs,
-  fontWeight:  700,
-  color:       "rgba(255,255,255,0.8)",
+  fontWeight:  900,
+  color:       "rgb(255, 255, 255)",
   whiteSpace:  "nowrap",
   letterSpacing: "0.05em",
 };

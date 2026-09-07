@@ -7,7 +7,8 @@
 // =============================================================
 
 import { defineBlocks as defineMark1 } from "./mark1.js";
-
+import { defineBlocks as defineMark2 } from "./mark2.js";
+import { defineBlocks as defineCube }  from "./cube.js";
 // ── Future robot libraries (uncomment to activate) ────────────
 // import { defineBlocks as defineMark2 }      from "./mark2.js";
 // import { defineBlocks as defineSensorPack } from "./sensor_pack.js";
@@ -21,8 +22,8 @@ import { defineBlocks as defineMark1 } from "./mark1.js";
  */
 export function registerAllBlocks(Blockly, Blocks) {
   defineMark1(Blockly, Blocks);
-
-  // Future:
-  // defineMark2(Blockly, Blocks);
-  // defineSensorPack(Blockly, Blocks);
+  defineMark2(Blockly, Blocks);
+  defineCube(Blockly, Blocks);
 }
+
+

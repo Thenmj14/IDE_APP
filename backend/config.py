@@ -56,7 +56,7 @@ def _default_cli_path():
             return path
     return "arduino-cli"           # last resort — must be on PATH
 
-ARDUINO_CLI_PATH = os.environ.get("ARDUINO_CLI_PATH", _default_cli_path())
+ARDUINO_CLI_PATH = "/opt/render/project/bin/arduino-cli"
 
 # ── Sketch temp directory ─────────────────────────────────────
 # Where the .ino is written before compile/upload.
@@ -64,7 +64,7 @@ SKETCH_DIR = os.path.join(os.path.dirname(__file__), "..", "tmp", "sketch")
 SKETCH_NAME = "sketch"             # sketch/sketch.ino
 
 # ── Upload timeout ────────────────────────────────────────────
-UPLOAD_TIMEOUT_SECONDS = 60        # Max time to wait for compile + upload
+UPLOAD_TIMEOUT_SECONDS = 300        # Max time to wait for compile + upload
 
 # ── Static frontend build path ────────────────────────────────
 # Flask serves the built React app from here in production mode.

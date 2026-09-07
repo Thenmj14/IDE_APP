@@ -3,7 +3,7 @@
 // =============================================================
 
 import { StrictMode } from "react";
-import { createRoot }  from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import { injectCSSVariables } from "./theme/tokens.js";
 
@@ -29,7 +29,9 @@ const globalCSS = `
 
   /* Blockly overrides */
   .blocklyToolboxDiv { background: var(--color-sidebar-dark) !important; }
-  .blocklyFlyout { background: var(--color-surface) !important; }
+  .blocklyFlyout {
+  background: var(--color-surface) !important;
+  position: fixed !important; }  
   .blocklyTreeRow:hover { background: rgba(29,185,84,0.15) !important; }
   .blocklyTreeSelected { background: rgba(29,185,84,0.25) !important; }
   .blocklyTreeLabel { font-family: var(--font-ui) !important; font-size: 13px !important; }

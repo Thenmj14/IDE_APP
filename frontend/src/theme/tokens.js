@@ -7,9 +7,9 @@
 
 export const colors = {
   // ── Primary greens (toolbar, buttons, active states) ───────
-  primaryGreen:     "#1DB954",
+  primaryGreen:     "#24c28d",
   primaryGreenDark: "#158a3e",
-  primaryGreenLight:"#25e068",
+  primaryGreenLight:"#2abe5e",
   primaryGreenMuted:"#1a9c47",
 
   // ── Panels ─────────────────────────────────────────────────
@@ -37,6 +37,7 @@ export const colors = {
   success:          "#06D6A0",   // upload success
   error:            "#FF4757",   // upload error / compile fail
   info:             "#54A0FF",   // neutral info
+  logpannel:       "#f8f8f8",   // background for log panel
 
   // ── Block canvas ────────────────────────────────────────────
   canvasBg:         "#FFFFFF",

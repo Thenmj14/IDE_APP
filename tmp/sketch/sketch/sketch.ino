@@ -4,13 +4,10 @@ Mark1 robot;
 
 
 void setup() {
-  robot.begin();
-
+  // setup code here
 }
 
 void loop() {
   robot.forward(150);
-  Serial.println("hii..loop");
-  delay(10);
 
 }

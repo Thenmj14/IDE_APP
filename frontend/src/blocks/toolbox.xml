@@ -61,6 +61,14 @@
     <block type="mark1_on_line"></block>
 
   </category>
+  <category name="🤖 Mark2" colour="#3399ff">
+
+  <label text="Setup"/>
+
+  <block type="mark2_begin"></block>
+
+  </category>
+  
 
   <!-- ═══════════════════════════════════════════════════════ -->
   <!--  ARDUINO I/O                                           -->
