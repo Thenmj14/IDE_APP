@@ -21,6 +21,10 @@ class ArduinoUploader:
 
     def __init__(self):
         self.cli = ARDUINO_CLI_PATH
+        self.config_file = os.environ.get(
+            "ARDUINO_CLI_CONFIG",
+            "/opt/render/project/bin/arduino-cli.yaml"
+        )
 
     # ── Public API ────────────────────────────────────────────
 
@@ -72,7 +76,7 @@ class ArduinoUploader:
         """Check arduino-cli is reachable and return its version."""
         try:
             result = subprocess.run(
-                [self.cli, "version"],
+                [self.cli, "--config-file", self.config_file, "version"],
                 capture_output=True, text=True, timeout=10
             )
             return {"available": True, "version": result.stdout.strip()}
@@ -102,7 +106,7 @@ class ArduinoUploader:
         """Run arduino-cli compile, output to a known build folder."""
         build_dir = os.path.join(sketch_path, "build_output")
         cmd = [
-            self.cli, "compile",
+            self.cli, "--config-file", self.config_file, "compile",
             "--fqbn", fqbn,
             "--warnings", "default",
             "--output-dir", build_dir,
@@ -199,7 +203,7 @@ class ArduinoUploader:
         """Use arduino-cli board list to get connected ports."""
         try:
             result = subprocess.run(
-                [self.cli, "board", "list"],
+                [self.cli, "--config-file", self.config_file, "board", "list"],
                 capture_output=True, text=True, timeout=10
             )
             ports = []
