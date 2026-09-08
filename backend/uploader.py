@@ -8,6 +8,8 @@ import os
 import subprocess
 import shutil
 import tempfile
+import base64
+import glob
 from config import ARDUINO_CLI_PATH, SKETCH_DIR, SKETCH_NAME, UPLOAD_TIMEOUT_SECONDS
 
 
@@ -24,25 +26,37 @@ class ArduinoUploader:
 
     def upload(self, code: str, fqbn: str, port: str) -> dict:
         """
-        Full pipeline: write sketch → compile → upload.
+        Direct USB upload is not available on a cloud server —
+        this backend only compiles. Uploading happens in the browser.
         """
-        compile_result = self.compile_only(code, fqbn)
-        if not compile_result["success"]:
-            return compile_result
-
-        return self.flash_only(fqbn, port)
+        return {
+            "success": False,
+            "log": "Direct upload is not available on this server. "
+                "This backend only compiles code — uploading to your "
+                "board happens through your browser instead."
+        }
 
     def compile_only(self, code: str, fqbn: str) -> dict:
-        """Writes sketch and compiles it."""
+        """Writes sketch, compiles it, and returns the compiled file."""
         sketch_path = self._write_sketch(code)
         if not sketch_path:
             return {"success": False, "log": "ERROR: Could not write sketch to disk."}
-        return self._compile(sketch_path, fqbn)
+
+        result = self._compile(sketch_path, fqbn)
+
+        if result["success"]:
+            binary_info = self._read_compiled_binary(result["build_dir"])
+            result["binary"] = binary_info
+        else:
+            result["binary"] = {"found": False}
+
+        return result
 
     def flash_only(self, fqbn: str, port: str) -> dict:
-        """Uploads the previously compiled sketch."""
-        sketch_path = os.path.join(SKETCH_DIR, SKETCH_NAME)
-        return self._upload(sketch_path, fqbn, port)
+        return {
+            "success": False,
+            "log": "Direct upload is not available on this server."
+        }
 
     def list_ports(self) -> list[str]:
         """
@@ -85,14 +99,45 @@ class ArduinoUploader:
             return None
 
     def _compile(self, sketch_path: str, fqbn: str) -> dict:
-        """Run arduino-cli compile."""
+        """Run arduino-cli compile, output to a known build folder."""
+        build_dir = os.path.join(sketch_path, "build_output")
         cmd = [
             self.cli, "compile",
             "--fqbn", fqbn,
             "--warnings", "default",
+            "--output-dir", build_dir,
             sketch_path
         ]
-        return self._run(cmd, step="COMPILE")
+        result = self._run(cmd, step="COMPILE")
+        result["build_dir"] = build_dir
+        return result
+    
+    def _read_compiled_binary(self, build_dir: str) -> dict:
+        """
+        Find the compiled .hex or .bin file in build_dir and
+        return it as base64 text (so it can travel over JSON/HTTP).
+        """
+        if not os.path.isdir(build_dir):
+            return {"found": False, "error": "Build folder not found."}
+
+        # Look for .hex first (AVR boards like Mark1/Mark2), then .bin (ESP32)
+        candidates = glob.glob(os.path.join(build_dir, "*.hex")) or \
+                    glob.glob(os.path.join(build_dir, "*.bin"))
+
+        if not candidates:
+            return {"found": False, "error": "No compiled .hex or .bin file found."}
+
+        file_path = candidates[0]
+        file_name = os.path.basename(file_path)
+
+        with open(file_path, "rb") as f:
+            file_bytes = f.read()
+
+        return {
+            "found": True,
+            "filename": file_name,
+            "data_base64": base64.b64encode(file_bytes).decode("utf-8"),
+        }
 
     def _upload(self, sketch_path: str, fqbn: str, port: str) -> dict:
         """Run arduino-cli upload."""

@@ -67,46 +67,30 @@ def cli_status():
     return jsonify(result)
 
 
-# ── POST /api/upload ──────────────────────────────────────────
+# ── POST /api/upload (DEPRECATED — compile-only on this server) ──
 @app.route("/api/upload", methods=["POST"])
 def upload():
     """
-    Compile and upload a sketch to the connected board.
-
-    Request body (JSON):
-        {
-            "code": "void setup() { ... }",
-            "fqbn": "arduino:avr:nano:cpu=atmega328",
-            "port": "COM3"
-        }
-
-    Response:
-        {
-            "success": true/false,
-            "log": "...full compile + upload output..."
-        }
+    NOTE: This server cannot upload to USB (it's not connected to
+    any board). This route now just compiles and returns the binary,
+    same as /api/compile. Actual USB upload happens in the browser.
     """
     data = request.get_json()
 
-    # ── Validate request ──────────────────────────────────────
     if not data:
         return jsonify({"success": False, "log": "No data received."}), 400
 
     code = data.get("code", "").strip()
     fqbn = data.get("fqbn", "").strip()
-    port = data.get("port", "").strip()
 
     if not code:
         return jsonify({"success": False, "log": "No code provided."}), 400
     if not fqbn:
         return jsonify({"success": False, "log": "No board selected."}), 400
-    if not port:
-        return jsonify({"success": False, "log": "No port selected."}), 400
 
-    # ── Run upload pipeline ───────────────────────────────────
-    result = uploader.upload(code=code, fqbn=fqbn, port=port)
-    status_code = 200 if result["success"] else 500
-    return jsonify(result), status_code
+    result = uploader.compile_only(code=code, fqbn=fqbn)
+    return jsonify(result), 200 if result["success"] else 500
+
 # ── POST /api/compile ─────────────────────────────────────────
 @app.route("/api/compile", methods=["POST"])
 def compile_sketch():
@@ -120,18 +104,18 @@ def compile_sketch():
     result = uploader.compile_only(code=code, fqbn=fqbn)
     return jsonify(result), 200 if result["success"] else 500
 
-# ── POST /api/flash ───────────────────────────────────────────
+# ── POST /api/flash (DISABLED on cloud server) ───────────────────
 @app.route("/api/flash", methods=["POST"])
 def flash_sketch():
-    data = request.get_json()
-    if not data: return jsonify({"success": False, "log": "No data received."}), 400
-    fqbn = data.get("fqbn", "").strip()
-    port = data.get("port", "").strip()
-    if not fqbn: return jsonify({"success": False, "log": "No board selected."}), 400
-    if not port: return jsonify({"success": False, "log": "No port selected."}), 400
-    
-    result = uploader.flash_only(fqbn=fqbn, port=port)
-    return jsonify(result), 200 if result["success"] else 500
+    """
+    Direct USB flashing isn't possible from a cloud server.
+    This will be handled by the browser (Web Serial) in a later phase.
+    """
+    return jsonify({
+        "success": False,
+        "log": "Direct flashing isn't available on this server. "
+               "Uploading to your board will happen through your browser."
+    }), 501
 
 # ── Serve React frontend (production mode) ────────────────────
 @app.route("/", defaults={"path": ""})
