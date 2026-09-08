@@ -20,14 +20,14 @@ class ArduinoUploader:
     """
 
     def __init__(self):
-        self.cli = ARDUINO_CLI_PATH
-        self.config_file = os.environ.get(
             "ARDUINO_CLI_CONFIG",
             "/opt/render/project/bin/arduino-cli.yaml"
         )
 
     # ── Public API ────────────────────────────────────────────
 
+        self.cli = ARDUINO_CLI_PATH
+        self.config_file = os.environ.get(
     def upload(self, code: str, fqbn: str, port: str) -> dict:
         """
         Direct USB upload is not available on a cloud server —
