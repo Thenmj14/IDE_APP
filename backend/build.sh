@@ -30,6 +30,10 @@ for i in 1 2 3; do
   sleep 5
 done
 
+# Install libraries used by Mark1/Mark2/Cube code
+$CLI --config-file $CONFIG_FILE lib install "Adafruit NeoPixel"
+$CLI --config-file $CONFIG_FILE lib install "Servo"
+
 $CLI --config-file $CONFIG_FILE core update-index --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 for i in 1 2 3; do
   $CLI --config-file $CONFIG_FILE core install esp32:esp32 --additional-urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json && break

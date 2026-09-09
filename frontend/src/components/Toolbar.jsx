@@ -46,34 +46,27 @@ export default function Toolbar({
     });
   };
 
-  // ── Upload ──────────────────────────────────────────────────
+    // ── Upload (TEMPORARY: compile-only test, skips port/flash for now) ──
   const handleUpload = async () => {
     if (!code)          return alert("No code to upload. Add some blocks first.");
     if (!selectedBoard) return alert("Please select a board.");
-    if (!selectedPort)  return alert("Please select a port.");
+    // NOTE: port check temporarily disabled — real USB upload comes in a later phase
 
     setUploading(true);
-    setUploadStep("Compiling...");
-    setUploadProgress(30);
+    setUploadStep("Compiling on server...");
+    setUploadProgress(50);
     onUploadStart?.();
 
     const compResult = await compileSketch(code, selectedBoard);
-    if (!compResult.success) {
-      setUploading(false);
-      onUploadDone?.(compResult);
-      return;
-    }
 
-    setUploadStep("Uploading...");
-    setUploadProgress(80);
-    const flashResult = await flashSketch(selectedBoard, selectedPort);
-    
     setUploadProgress(100);
     setTimeout(() => {
       setUploading(false);
       onUploadDone?.({
-        success: flashResult.success,
-        log: compResult.log + "\n\n" + flashResult.log
+        success: compResult.success,
+        log: compResult.success
+          ? compResult.log + `\n\n✔ TEST MODE: Compiled successfully on Render.\nBinary found: ${compResult.binary?.found}\nFilename: ${compResult.binary?.filename || "N/A"}`
+          : compResult.log
       });
     }, 500);
   };
